@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lista de tareas</title>
+<style>
+  :root{
+    --bg: #14181c;
+    --panel: #1c2229;
+    --ink: #eef1f4;
+    --muted: #8b96a3;
+    --accent: #4fd1a5;
+    --accent-soft: rgba(79,209,165,0.14);
+    --danger: #e2665f;
+    --line: #2a313a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--ink);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    display:flex;
+    justify-content:center;
+    padding:48px 20px;
+  }
+  .card{
+    width:100%;
+    max-width:480px;
+  }
+  header{
+    margin-bottom:28px;
+  }
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  h1{
+    font-size:28px;
+    margin:0;
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  .stats{
+    color:var(--muted);
+    font-size:13px;
+    margin-top:6px;
+  }
+  form{
+    display:flex;
+    gap:8px;
+    margin-bottom:24px;
+  }
+  input[type="text"]{
+    flex:1;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--ink);
+    font-size:15px;
+    outline:none;
+    transition:border-color .15s;
+  }
+  input[type="text"]:focus{
+    border-color:var(--accent);
+  }
+  button{
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .add-btn{
+    padding:12px 18px;
+    border-radius:10px;
+    border:none;
+    background:var(--accent);
+    color:#0b1210;
+    font-weight:700;
+    font-size:15px;
+  }
+  .add-btn:active{transform:scale(0.97);}
+  .filters{
+    display:flex;
+    gap:6px;
+    margin-bottom:16px;
+  }
+  .filter-btn{
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--muted);
+    padding:6px 12px;
+    border-radius:8px;
+    font-size:13px;
+  }
+  .filter-btn.active{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+    color:var(--accent);
+  }
+  ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  li{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+    animation:appear .18s ease;
+  }
+  @keyframes appear{
+    from{opacity:0; transform:translateY(4px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .check{
+    width:20px;
+    height:20px;
+    border-radius:6px;
+    border:2px solid var(--line);
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:transparent;
+  }
+  .check.done{
+    background:var(--accent);
+    border-color:var(--accent);
+  }
+  .check svg{
+    width:12px;height:12px;
+    display:none;
+  }
+  .check.done svg{display:block;}
+  .text{
+    flex:1;
+    font-size:15px;
+    word-break:break-word;
+  }
+  .text.done{
+    color:var(--muted);
+    text-decoration:line-through;
+  }
+  .delete{
+    border:none;
+    background:transparent;
+    color:var(--muted);
+    font-size:18px;
+    line-height:1;
+    padding:4px 6px;
+    border-radius:6px;
+  }
+  .delete:hover{color:var(--danger); background:rgba(226,102,95,0.1);}
+  .empty{
+    text-align:center;
+    color:var(--muted);
+    padding:40px 0;
+    font-size:14px;
+  }
+  .clear-done{
+    margin-top:18px;
+    width:100%;
+    background:transparent;
+    border:1px dashed var(--line);
+    color:var(--muted);
+    padding:10px;
+    border-radius:10px;
+    font-size:13px;
+  }
+  .clear-done:hover{border-color:var(--danger); color:var(--danger);}
+</style>
+</head>
+<body>
+<div class="card">
+  <header>
+    <div class="eyebrow">Hoy</div>
+    <h1>Lista de tareas</h1>
+    <div class="stats" id="stats">Cargando...</div>
+  </header>
+
+  <form id="form">
+    <input type="text" id="input" placeholder="Añadir una tarea..." autocomplete="off">
+    <button type="submit" class="add-btn">Añadir</button>
+  </form>
+
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all">Todas</button>
+    <button class="filter-btn" data-filter="pending">Pendientes</button>
+    <button class="filter-btn" data-filter="done">Hechas</button>
+  </div>
+
+  <ul id="list"></ul>
+  <div class="empty" id="empty" style="display:none;">No hay tareas por aquí.</div>
+
+  <button class="clear-done" id="clearDone">Borrar tareas completadas</button>
+</div>
+
+<script>
+  let tasks = [];
+  let filter = 'all';
+  const STORAGE_KEY = 'tasks';
+
+  const listEl = document.getElementById('list');
+  const emptyEl = document.getElementById('empty');
+  const statsEl = document.getElementById('stats');
+  const formEl = document.getElementById('form');
+  const inputEl = document.getElementById('input');
+
+  async function loadTasks(){
+    try{
+      const result = await window.storage.get(STORAGE_KEY, false);
+      tasks = result ? JSON.parse(result.value) : [];
+    }catch(e){
+      tasks = [];
+    }
+    render();
+  }
+
+  async function saveTasks(){
+    try{
+      await window.storage.set(STORAGE_KEY, JSON.stringify(tasks), false);
+    }catch(e){
+      console.error('No se pudo guardar', e);
+    }
+  }
+
+  function render(){
+    const filtered = tasks.filter(t=>{
+      if(filter==='pending') return !t.done;
+      if(filter==='done') return t.done;
+      return true;
+    });
+
+    listEl.innerHTML = '';
+    emptyEl.style.display = filtered.length ? 'none' : 'block';
+
+    filtered.forEach(t=>{
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <button class="check ${t.done?'done':''}" data-id="${t.id}" aria-label="Marcar como completada">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0b1210" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </button>
+        <span class="text ${t.done?'done':''}">${escapeHtml(t.text)}</span>
+        <button class="delete" data-id="${t.id}" aria-label="Eliminar">&times;</button>
+      `;
+      listEl.appendChild(li);
+    });
+
+    const pending = tasks.filter(t=>!t.done).length;
+    statsEl.textContent = tasks.length
+      ? `${pending} pendiente${pending!==1?'s':''} de ${tasks.length}`
+      : 'Sin tareas todavía';
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  formEl.addEventListener('submit', e=>{
+    e.preventDefault();
+    const text = inputEl.value.trim();
+    if(!text) return;
+    tasks.unshift({id: Date.now().toString(), text, done:false});
+    inputEl.value = '';
+    render();
+    saveTasks();
+  });
+
+  listEl.addEventListener('click', e=>{
+    const checkBtn = e.target.closest('.check');
+    const delBtn = e.target.closest('.delete');
+    if(checkBtn){
+      const id = checkBtn.dataset.id;
+      const t = tasks.find(t=>t.id===id);
+      if(t){ t.done = !t.done; render(); saveTasks(); }
+    }
+    if(delBtn){
+      const id = delBtn.dataset.id;
+      tasks = tasks.filter(t=>t.id!==id);
+      render();
+      saveTasks();
+    }
+  });
+
+  document.querySelectorAll('.filter-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      filter = btn.dataset.filter;
+      render();
+    });
+  });
+
+  document.getElementById('clearDone').addEventListener('click', ()=>{
+    tasks = tasks.filter(t=>!t.done);
+    render();
+    saveTasks();
+  });
+
+  loadTasks();
+</script>
+</body>
+</html>
