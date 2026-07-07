@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karin Calico GTF | Ficha del vehículo</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --asfalto:#0c0d10;
+    --asfalto-2:#15171c;
+    --amarillo:#f2c230;
+    --rojo:#e6432f;
+    --cromo:#c9cdd3;
+    --cromo-tenue:#8a8f98;
+    --linea:#2a2d33;
+  }
+
+  [data-theme="claro"]{
+    --asfalto:#f2f1ee;
+    --asfalto-2:#e7e5e0;
+    --cromo:#1b1c1f;
+    --cromo-tenue:#54565c;
+    --linea:#d4d1cb;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    background-color:var(--asfalto);
+    color:var(--cromo);
+    font-family:'Inter', sans-serif;
+    transition:background-color .35s ease, color .35s ease;
+    overflow-x:hidden;
+  }
+
+  h1,h2,h3, .brand, .stat-num, .speed-num{
+    font-family:'Rajdhani', sans-serif;
+    letter-spacing:.5px;
+  }
+
+  .eyebrow{
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:3px;
+    font-size:.75rem;
+    color:var(--amarillo);
+  }
+
+  /*  Navbar  */
+  .navbar{
+    background-color:rgba(12,13,16,.85);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--linea);
+  }
+  [data-theme="claro"] .navbar{ background-color:rgba(242,241,238,.9); }
+
+  .navbar-brand{
+    font-weight:700;
+    font-size:1.4rem;
+    color:var(--cromo) !important;
+  }
+  .navbar-brand span{ color:var(--amarillo); }
+
+  .nav-link{
+    color:var(--cromo-tenue) !important;
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    font-size:.85rem;
+    letter-spacing:1px;
+  }
+  .nav-link:hover, .nav-link.active{ color:var(--amarillo) !important; }
+
+  .btn-racing{
+    background-color:var(--amarillo);
+    color:#0c0d10;
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-weight:600;
+    border:none;
+    padding:.6rem 1.4rem;
+    clip-path:polygon(6% 0, 100% 0, 94% 100%, 0 100%);
+  }
+  .btn-racing:hover{ background-color:#ffd75c; color:#0c0d10; }
+
+  .btn-outline-racing{
+    border:1px solid var(--cromo-tenue);
+    color:var(--cromo);
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-size:.85rem;
+  }
+  .btn-outline-racing:hover{ border-color:var(--amarillo); color:var(--amarillo); background:transparent; }
+
+  /*  Hero  */
+  .hero{
+    position:relative;
+    padding-top:9rem;
+    padding-bottom:4rem;
+    border-bottom:1px solid var(--linea);
+    background:
+      repeating-linear-gradient(115deg, transparent 0 90px, rgba(230,67,47,.05) 90px 92px),
+      radial-gradient(circle at 80% 20%, rgba(242,194,48,.08), transparent 45%);
+  }
+
+  .hero-plate{
+    display:inline-block;
+    border:2px solid var(--amarillo);
+    color:var(--amarillo);
+    font-family:'Oswald', sans-serif;
+    letter-spacing:4px;
+    font-size:.8rem;
+    padding:.25rem .75rem;
+    margin-bottom:1rem;
+  }
+
+  .hero h1{
+    font-size:clamp(2.8rem, 6vw, 5.2rem);
+    font-weight:700;
+    line-height:1;
+    margin-bottom:.5rem;
+  }
+  .hero h1 em{
+    font-style:normal;
+    color:var(--amarillo);
+  }
+
+  .hero-sub{
+    color:var(--cromo-tenue);
+    font-size:1.05rem;
+    max-width:520px;
+  }
+
+  .hero-silhouette{
+    width:100%;
+    max-width:520px;
+  }
+
+  #reloj{
+    font-family:'Rajdhani', sans-serif;
+    font-weight:600;
+    color:var(--amarillo);
+    font-size:1.1rem;
+  }
+
+  /*  Secciones  */
+  section{ padding:5rem 0; border-bottom:1px solid var(--linea); }
+
+  .section-title{
+    font-size:2.2rem;
+    font-weight:700;
+    margin-bottom:.25rem;
+  }
+  .section-title span{ color:var(--amarillo); }
+
+  /*  Ficha técnica (Sobre mí)  */
+  .ficha-card{
+    background-color:var(--asfalto-2);
+    border:1px solid var(--linea);
+    padding:2rem;
+    height:100%;
+  }
+  .ficha-item{
+    display:flex;
+    justify-content:space-between;
+    border-bottom:1px dashed var(--linea);
+    padding:.6rem 0;
+    font-family:'Oswald', sans-serif;
+    font-size:.95rem;
+  }
+  .ficha-item span:first-child{ color:var(--cromo-tenue); text-transform:uppercase; letter-spacing:1px; font-size:.8rem; }
+  .ficha-item span:last-child{ color:var(--cromo); font-weight:600; }
+
+  .toggle-detalle-btn{ margin-top:1.2rem; }
+  #detalle-extra{ display:none; }
+
+  /*  Rendimiento (Habilidades)  */
+  .stat-block{ margin-bottom:1.8rem; }
+  .stat-label{
+    display:flex; justify-content:space-between;
+    font-family:'Oswald', sans-serif; text-transform:uppercase;
+    font-size:.85rem; letter-spacing:1px; color:var(--cromo-tenue);
+    margin-bottom:.4rem;
+  }
+  .stat-num{ color:var(--amarillo); font-weight:700; }
+  .progress{ background-color:var(--linea); height:10px; border-radius:0; }
+  .progress-bar{ background-color:var(--amarillo); }
+  .progress-bar.rojo{ background-color:var(--rojo); }
+
+  /* Galería  */
+  .gallery-item{
+    background-color:var(--asfalto-2);
+    border:1px solid var(--linea);
+    overflow:hidden;
+    position:relative;
+  }
+  .gallery-item img{
+    width:100%;
+    height:220px;
+    object-fit: cover;
+    display:block;
+  }
+  .gallery-caption{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    padding:.5rem .9rem;
+    background:linear-gradient(to top, rgba(0,0,0,.85), transparent);
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-size:.75rem;
+    color:#fff;
+  }
+  [data-theme="claro"] .gallery-caption{ color:#fff; }
+
+  /*  Proyectos / Variantes  */
+  .card-variant{
+    background-color:var(--asfalto-2);
+    border:1px solid var(--linea);
+    color:var(--cromo);
+    overflow:hidden;
+    transition:transform .25s ease, border-color .25s ease;
+  }
+  .card-variant:hover{ transform:translateY(-6px); border-color:var(--amarillo); }
+  .card-variant .card-img-wrap{
+    height:170px;
+    overflow: hidden;
+    background:linear-gradient(135deg, var(--linea), var(--asfalto-2));
+    display:flex; align-items:center; justify-content:center;
+    border-bottom:1px solid var(--linea);
+  }
+  .card-variant .card-img-wrap img{ width:100%; height:100%; object-fit: cover; }
+  .card-variant .card-title{ font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:1px; font-size:1.05rem; }
+  .card-variant .card-text{ color:var(--cromo-tenue); font-size:.9rem; }
+  .badge-tag{
+    background-color:transparent;
+    border:1px solid var(--amarillo);
+    color:var(--amarillo);
+    font-family:'Oswald', sans-serif;
+    font-weight:400;
+    letter-spacing:1px;
+    font-size:.7rem;
+  }
+
+  /*  Contacto  */
+  .form-control, .form-select{
+    background-color:var(--asfalto-2);
+    border:1px solid var(--linea);
+    color:var(--cromo);
+  }
+  .form-control:focus, .form-select:focus{
+    background-color:var(--asfalto-2);
+    color:var(--cromo);
+    border-color:var(--amarillo);
+    box-shadow:0 0 0 .2rem rgba(242,194,48,.15);
+  }
+  .form-control::placeholder{ color:var(--cromo-tenue); }
+  .form-label{ font-family:'Oswald', sans-serif; text-transform:uppercase; font-size:.8rem; letter-spacing:1px; color:var(--cromo-tenue); }
+
+  .invalid-msg{ color:var(--rojo); font-size:.8rem; display:none; margin-top:.25rem; }
+  .was-validated-custom .is-invalid ~ .invalid-msg{ display:block; }
+  .is-invalid{ border-color:var(--rojo) !important; }
+
+  #envio-ok{ display:none; }
+
+  footer{
+    padding:2rem 0;
+    text-align:center;
+    color:var(--cromo-tenue);
+    font-family:'Oswald', sans-serif;
+    font-size:.85rem;
+    letter-spacing:1px;
+  }
+
+  ::selection{ background:var(--amarillo); color:#0c0d10; }
+</style>
+</head>
+
+<body data-theme="oscuro">
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top py-3">
+  <div class="container">
+    <a class="navbar-brand" href="#inicio">KARIN <span>CATALOG</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" style="border-color:var(--linea);">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navMenu">
+    <ul class="navbar-nav gap-lg-4 align-items-lg-center">
+    <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
+    <li class="nav-item"><a class="nav-link" href="#ficha">Ficha técnica</a></li>
+    <li class="nav-item"><a class="nav-link" href="#rendimiento">Rendimiento</a></li>
+    <li class="nav-item"><a class="nav-link" href="#galeria">Galería</a></li>
+    <li class="nav-item"><a class="nav-link" href="#variantes">Variantes</a></li>
+    <li class="nav-item"><a class="nav-link" href="#contacto">Reservar</a></li>
+    <li class="nav-item mt-2 mt-lg-0">
+        <button id="btn-tema" class="btn btn-outline-racing btn-sm"> 🌙 Modo claro</button>
+    </li>
+</ul>
+
+<audio id="sonidoMenu">
+    <source src="menu_click.mp3" type="audio/mpeg"> </audio>
+
+
+<script>
+    const sonidoMenu = document.getElementById("sonidoMenu");
+    const elementosMenu = document.querySelectorAll(".nav-link, #btn-tema");
+
+   
+    elementosMenu.forEach(elemento => {
+        elemento.addEventListener("click", () => {
+            sonidoMenu.currentTime = 0; 
+            sonidoMenu.play();          
+        });
+    });
+</script>
+</nav>
+
+<!-- HERO / INICIO -->
+<header id="inicio" class="hero">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <div class="hero-plate">JDM · TUNER · RALLY</div>
+        <h1>Karin <em>Calico GTF</em></h1>
+        <p class="hero-sub">
+          El rey de las calles de Los Santos. Un deportivo legendario del universo de <strong>Grand Theft Auto V</strong>, inspirado en el icónico Toyota Celica GT-Four. Tracción total, turbo y dominio absoluto.
+        </p>
+        <div class="d-flex flex-wrap gap-3 mt-4">
+          <button class="btn btn-racing" id="btn-bienvenida">🔑 Arrancar motor</button>
+
+<audio id="sonidoEncendido">
+    <source src="encendido Limpio.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    const boton = document.getElementById("btn-bienvenida");
+    const sonido = document.getElementById("sonidoEncendido");
+
+    boton.addEventListener("click", () => {
+        sonido.currentTime = 0; 
+        sonido.play();
+    });
+</script>
+          <a href="#variantes" class="btn btn-outline-racing" id="btn-preparaciones">Ver preparaciones</a>
+
+<audio id="sonidoPreparaciones">
+    <source src="gtag-click.mp3" type="audio/mpeg"> </audio>
+
+<script>
+    const botonPreparaciones = document.getElementById("btn-preparaciones");
+    const sonidoPreparaciones = document.getElementById("sonidoPreparaciones");
+
+    botonPreparaciones.addEventListener("click", () => {
+        sonidoPreparaciones.currentTime = 0; 
+        sonidoPreparaciones.play();          
+    });
+</script>
+        </div>
+        <div class="mt-4" id="reloj"></div>
+        <div id="mensaje-bienvenida" class="mt-3 p-3" style="display:none; background:var(--asfalto-2); border-left:3px solid var(--amarillo);"></div>
+      </div>
+      <div class="col-lg-5 text-center mt-5 mt-lg-0">
+        <img class="hero-silhouette" src="Calico-GTF1.png" alt="Calico GTF1" style="width: 1000px !important; height: auto !important;">
+          <ellipse cx="250" cy="220" rx="200" ry="14" fill="rgba(0,0,0,0.35)"/>
+          <path d="M40 170
+                   C 55 130, 100 95, 150 90
+                   C 175 65, 230 45, 275 48
+                   C 320 50, 350 70, 375 95
+                   C 410 98, 440 115, 455 140
+                   L 455 170
+                   C 455 178, 448 182, 440 182
+                   L 400 182
+                   C 398 160, 380 145, 360 145
+                   C 340 145, 322 160, 320 182
+                   L 175 182
+                   C 173 160, 155 145, 135 145
+                   C 115 145, 97 160, 95 182
+                   L 55 182
+                   C 46 182, 40 178, 40 170 Z"
+                fill="none" stroke="var(--amarillo)" stroke-width="3"/>
+          <circle cx="135" cy="182" r="24" fill="none" stroke="var(--cromo)" stroke-width="3"/>
+          <circle cx="360" cy="182" r="24" fill="none" stroke="var(--cromo)" stroke-width="3"/>
+          <line x1="150" y1="90" x2="375" y2="95" stroke="var(--rojo)" stroke-width="2" stroke-dasharray="6 4"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- FICHA TÉCNICA / SOBRE MÍ -->
+<section id="ficha">
+  <div class="container">
+    <p class="eyebrow">Sobre el vehículo</p>
+    <h2 class="section-title">Ficha <span>técnica</span></h2>
+    <div class="row g-4 mt-2">
+      <div class="col-lg-7">
+        <p style="color:var(--cromo-tenue); max-width:640px;">
+          El Karin Calico GTF es un deportivo de tres puertas introducido en GTA Online como parte de la actualización Los Santos Tuners. Basado fuertemente en el Toyota Celica GT-Four (ST205), es famoso por su increíble aceleración y tracción total, lo que lo convierte en uno de los coches más competitivos para carreras callejeras y pursuit. Es la plataforma de tuneo definitiva.
+        </p>
+      
+<button class="btn btn-outline-racing toggle-detalle-btn" id="btn-detalle">Mostrar historia y datos extra ▾</button> 
+
+<audio id="sonidoHistoria">
+    <source src="gtag-click.mp3" type="audio/mpeg"> 
+</audio>
+
+<script>
+    const botonDetalle = document.getElementById("btn-detalle");
+    const sonidoHistoria = document.getElementById("sonidoHistoria");
+
+    botonDetalle.addEventListener("click", () => {
+        sonidoHistoria.currentTime = 0; 
+        sonidoHistoria.play();          
+    });
+</script>
+        <div id="detalle-extra" class="mt-3" style="color:var(--cromo-tenue); border-left:2px solid var(--amarillo); padding-left:1rem;">
+          <p>
+            Representa la edad de oro de los rallyes de los 90. En el juego, es conocido por tener una de las mejores estadísticas de tracción, lo que le permite salir de las curvas más rápido que casi cualquier otro coche de su clase. Su motor de 4 cilindros en línea turboalimentado ofrece un sonido distintivo y una entrega de potencia inmediata.
+          </p>
+          <p class="mb-0">
+            Aunque su manejo puede ser técnico debido a su subviraje inherente de AWD a alta velocidad, es la elección preferida de los pilotos que buscan el mejor tiempo de vuelta en circuitos revirados.
+          </p>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="ficha-card">
+          <div class="ficha-item"><span>Categoría</span><span>Deportivos / Tuners</span></div>
+          <div class="ficha-item"><span>Tracción</span><span>Total (AWD)</span></div>
+          <div class="ficha-item"><span>Motor</span><span>4 Cils en línea Turbo</span></div>
+          <div class="ficha-item"><span>Transmisión</span><span>5 Velocidades</span></div>
+          <div class="ficha-item"><span>Precio (LS Tuners)</span><span>$1,995,000 / $1,496,250</span></div>
+          <div class="ficha-item"><span>Fabricante</span><span>Karin (ficticio)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RENDIMIENTO / HABILIDADES -->
+<section id="rendimiento">
+  <div class="container">
+    <p class="eyebrow">Estadísticas en juego</p>
+    <h2 class="section-title">Rendimiento <span>estimado</span></h2>
+    <div class="row g-5 mt-2">
+      <div class="col-lg-6">
+        <div class="stat-block">
+          <div class="stat-label">Velocidad máxima <span class="stat-num">84 / 100</span></div>
+          <div class="progress"><div class="progress-bar" style="width:84%"></div></div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Aceleración <span class="stat-num">100 / 100</span></div>
+          <div class="progress"><div class="progress-bar" style="width:100%"></div></div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Manejo <span class="stat-num">78 / 100</span></div>
+          <div class="progress"><div class="progress-bar rojo" style="width:78%"></div></div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Frenado <span class="stat-num">33 / 100</span></div>
+          <div class="progress"><div class="progress-bar rojo" style="width:33%"></div></div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="ficha-card text-center">
+              <div class="speed-num" style="font-size:2.4rem; color:var(--amarillo); font-weight:700;">194</div>
+              <div style="color:var(--cromo-tenue); font-size:.8rem; text-transform:uppercase; letter-spacing:1px;">km/h aprox. (stock)</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="ficha-card text-center">
+              <div class="speed-num" style="font-size:2.4rem; color:var(--amarillo); font-weight:700;">3.8s</div>
+              <div style="color:var(--cromo-tenue); font-size:.8rem; text-transform:uppercase; letter-spacing:1px;">0-100 km/h (estimado full)</div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="ficha-card">
+              <p style="color:var(--cromo-tenue); font-size:.9rem; margin-bottom:0;">
+                Nota: Los valores de barra son representaciones de la interfaz del juego (0-100 Broughy1322 scale). La velocidad máxima y aceleración son excepcionales, mientras que el frenado es su punto débil.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALERÍA -->
+<section id="galeria">
+  <div class="container">
+    <p class="eyebrow">Vistas del vehículo</p>
+    <h2 class="section-title">Galería <span>del Calico GTF</span></h2>
+    <p style="color:var(--cromo-tenue); max-width:640px;" class="mb-4">
+      Imágenes directas desde el motor de GTA V mostrando el Calico GTF en diferentes configuraciones y localizaciones de San Andreas.
+    </p>
+    <div class="row g-3">
+
+      <div class="col-md-6 col-lg-3">
+        <div class="gallery-item">
+          <!-- Gallery image 1 replaced -->
+          <img src="lado.png" alt="Karin Calico GTF Perfil Lateral">
+          <div class="gallery-caption">Perfil lateral (Estilo Rally)</div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="gallery-item">
+          <!-- Gallery image 2 replaced -->
+          <img src="frente.png" alt="Karin Calico GTF Vista Frontal">
+          <div class="gallery-caption">Frontal agresivo con faros dobles</div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="gallery-item">
+          <!-- Gallery image 3 replaced -->
+          <img src="atras.png" alt="Karin Calico GTF Vista Trasera">
+          <div class="gallery-caption">Zaga con alerón alto y tracción total</div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="gallery-item">
+          <!-- Gallery image 4 replaced -->
+          <img src="dentro.png" alt="Karin Calico GTF Interior">
+          <div class="gallery-caption">Interior de competición (Tuner style)</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- VARIANTES / PROYECTOS -->
+<section id="variantes">
+  <div class="container">
+    <p class="eyebrow">Garage de Hao</p>
+    <h2 class="section-title">Preparaciones y <span>kits</span></h2>
+    <div class="row g-4 mt-2">
+
+      <div class="col-md-4">
+        <div class="card card-variant h-100">
+          <div class="card-img-wrap">
+            <!-- Variant image 1 replaced -->
+            <img src="calle.png" alt="Calico GTF Configuración de Calle">
+          </div>
+          <div class="card-body">
+            <span class="badge badge-tag mb-2">Clean Street</span>
+            <h3 class="card-title">Estilo de calle limpio</h3>
+            <p class="card-text">Pintura metalizada, llantas cóncavas y suspensión baja. Una preparación sutil para dominar las reuniones del LS Car Meet.</p>
+            <button class="btn btn-outline-racing btn-sm w-100 ver-mas-btn" data-nombre="Clean Street">Ver detalle</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card card-variant h-100">
+          <div class="card-img-wrap">
+            <!-- Variant image 2 replaced -->
+            <img src="rally.png" alt="Calico GTF Kit de Rally de los 90">
+          </div>
+          <div class="card-body">
+            <span class="badge badge-tag mb-2">Rally Nostalgia</span>
+            <h3 class="card-title">Homenaje Rally 90s</h3>
+            <p class="card-text">La mítica librea "Castrol", alerón de rally alto, guardabarros rojos y faros antiniebla extra. Listo para la tierra de Blaine County.</p>
+            <button class="btn btn-outline-racing btn-sm w-100 ver-mas-btn" data-nombre="Rally Nostalgia">Ver detalle</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card card-variant h-100">
+          <div class="card-img-wrap">
+            <!-- Variant image 3 replaced -->
+            <img src="circuito.png" alt="Calico GTF Preparación de Pista Extrema">
+          </div>
+          <div class="card-body">
+            <span class="badge badge-tag mb-2">Track Weapon</span>
+            <h3 class="card-title">Arma de circuito</h3>
+            <p class="card-text">Kit de carrocería ancho, capó de carbono perforado, interior vaciado con jaula antivuelco y slicks de competición.</p>
+            <button class="btn btn-outline-racing btn-sm w-100 ver-mas-btn" data-nombre="Track Weapon">Ver detalle</button> 
+
+<audio id="sonidoDetalle">
+    <source src="menu_enter.mp3" type="audio/mpeg"> </audio>
+
+<script>
+    const sonidoDetalle = document.getElementById("sonidoDetalle");
+    const botonesVerMas = document.querySelectorAll(".ver-mas-btn");
+
+    botonesVerMas.forEach(boton => {
+        boton.addEventListener("click", () => {
+            sonidoDetalle.currentTime = 0; 
+            sonidoDetalle.play();          
+        });
+    });
+</script>
+        </div>
+      </div>
+
+    </div>
+    <p id="detalle-variante" class="mt-4" style="color:var(--amarillo); display:none;"></p>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto" style="border-bottom:none;">
+  <div class="container">
+    <p class="eyebrow">Concesionaria Southern San Andreas</p>
+    <h2 class="section-title">Reserva tu <span>Tuner</span></h2>
+    <div class="row mt-4">
+      <div class="col-lg-7">
+        <form id="form-contacto" novalidate>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="nombre">GamerTag / Nombre</label>
+              <input type="text" class="form-control" id="nombre" placeholder="nombre">
+              <div class="invalid-msg">Ingresá tu nombre.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="correo">Correo electrónico</label>
+              <input type="email" class="form-control" id="correo" placeholder="nombre@correo.com">
+              <div class="invalid-msg">Ingresá un correo válido.</div>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="mensaje">Especificaciones</label>
+              <textarea class="form-control" id="mensaje" rows="4" placeholder="¿Qué kit de tuneo principal te interesa para tu Calico?"></textarea>
+              <div class="invalid-msg">Escribí un mensaje.</div>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-racing" id="btn-compra">Enviar solicitud de compra</button>
+
+<audio id="sonidoCompra">
+    <source src="gta-v-notification.mp3" type="audio/mpeg"> </audio>
+
+<script>
+    const botonCompra = document.getElementById("btn-compra");
+    const sonidoCompra = document.getElementById("sonidoCompra");
+
+    botonCompra.addEventListener("click", (evento) => {
+        
+        sonidoCompra.currentTime = 0; 
+        sonidoCompra.play(); 
+    });
+</script>
+              
+              <p id="envio-ok" class="mt-3" style="color:var(--amarillo);">✔ Solicitud enviada a Southern San Andreas Super Autos. Te contactaremos en tu iFruit pronto.</p>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-lg-5 mt-5 mt-lg-0">
+        <div class="ficha-card">
+          <h3 style="font-size:1.2rem; margin-bottom:1rem;">LS Car Meet - Taller Asociado</h3>
+          <div class="ficha-item"><span>Ubicación</span><span>Cypress Flats, LS</span></div>
+          <div class="ficha-item"><span>Mecánico Principal</span><span>Hao</span></div>
+          <div class="ficha-item"><span>Nivel Requerido</span><span>20 (Para precio especial)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Proyecto académico Diego Haas — Ficha del vehículo Karin Calico GTF. El diseño está inspirado en el Toyota Celica GT-Four 
+  <li style="color: black;">(puto el que lo lea).</li>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Mensaje de bienvenida
+  document.getElementById('btn-bienvenida').addEventListener('click', function () {
+    const caja = document.getElementById('mensaje-bienvenida');
+    caja.style.display = 'block';
+    caja.textContent = '🏁 Motor encendido. Tracción total activada. Bienvenido al garaje del Calico GTF, listo para dominar el Car Meet.';
+  });
+
+  // Cambiar tema 
+  const btnTema = document.getElementById('btn-tema');
+  btnTema.addEventListener('click', function () {
+    const actual = document.body.getAttribute('data-theme');
+    if (actual === 'oscuro') {
+      document.body.setAttribute('data-theme', 'claro');
+      btnTema.textContent = '☀️ Modo oscuro';
+    } else {
+      document.body.setAttribute('data-theme', 'oscuro');
+      btnTema.textContent = '🌙 Modo claro';
+    }
+  });
+
+  // información extra 
+  const btnDetalle = document.getElementById('btn-detalle');
+  const detalleExtra = document.getElementById('detalle-extra');
+  btnDetalle.addEventListener('click', function () {
+    const visible = detalleExtra.style.display === 'block';
+    detalleExtra.style.display = visible ? 'none' : 'block';
+    btnDetalle.textContent = visible ? 'Mostrar historia y datos extra ▾' : 'Ocultar historia y datos extra ▴';
+  });
+
+  //  info de variantes 
+  const detalleVariante = document.getElementById('detalle-variante');
+  document.querySelectorAll('.ver-mas-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      detalleVariante.style.display = 'block';
+      detalleVariante.textContent = 'Seleccionaste el Kit: ' + btn.dataset.nombre + '. Consultá disponibilidad y coste de tuneo en tu taller asociado del Car Meet.';
+    });
+  });
+
+  // Mostrar fecha y hora 
+  function actualizarReloj() {
+    const ahora = new Date();
+    document.getElementById('reloj').textContent = '📅 ' + ahora.toLocaleDateString('es-ES') + '   🕒 ' + ahora.toLocaleTimeString('es-ES') ;
+  }
+  actualizarReloj();
+  setInterval(actualizarReloj, 1000);
+
+  // Validación del formulario
+  const form = document.getElementById('form-contacto');
+  const campoNombre = document.getElementById('nombre');
+  const campoCorreo = document.getElementById('correo');
+  const campoMensaje = document.getElementById('mensaje');
+
+  function validarCampo(campo, esValido) {
+    if (esValido) {
+      campo.classList.remove('is-invalid');
+    } else {
+      campo.classList.add('is-invalid');
+    }
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const nombreOk = campoNombre.value.trim().length > 0;
+    const correoOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(campoCorreo.value.trim());
+    const mensajeOk = campoMensaje.value.trim().length > 0;
+
+    validarCampo(campoNombre, nombreOk);
+    validarCampo(campoCorreo, correoOk);
+    validarCampo(campoMensaje, mensajeOk);
+
+    const envioOk = document.getElementById('envio-ok');
+    if (nombreOk && correoOk && mensajeOk) {
+      envioOk.style.display = 'block';
+      form.reset();
+      setTimeout(function () { envioOk.style.display = 'none'; }, 4000);
+    } else {
+      envioOk.style.display = 'none';
+    }
+  });
+</script>
+
+</body>
+</html>
